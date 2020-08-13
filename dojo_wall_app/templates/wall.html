@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dojo Wall</title>
+    {% load static %}
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+    <script src="{% static 'js/script.js' %}"></script>
+  </head>
+
+  <body>
+    <div class="header">
+      <span>
+        <a href="/log_out">sign off</a>
+        <a href="/index">Main</a>
+      </span>
+
+      <h2>CodingDojo Wall</h2>
+      <p>Welcome, {{user.first_name}}</p>
+    </div>
+    <!-- message form  -->
+    <div class="post">
+      <form action="/new_message" method="POST" id="message_box">
+        {%csrf_token%}
+        <!-- <label for="message">Post a message</label><br /> -->
+        <textarea
+          name="message"
+          cols="100"
+          rows="10"
+          placeholder="Post a message."
+        ></textarea
+        ><br />
+        <input type="hidden" name="user_id" value="{{user.id}}" />
+        <button type="submit">Post a message</button>
+      </form>
+    </div>
+    <!-- display errors -->
+    <div class="messages_all">
+      {% if messages %}
+      <ul class="messages_list">
+        {% for message in messages %}
+        <li {% if message.tags %} class="{{message.tags}}" {% endif %}>
+          {{message}}
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </div><br>
+
+    <!-- display messages -->
+    {% for message in all_messages reversed %}
+    <div class="messages">
+      <p>
+        <strong id="user"
+          >{{message.user.first_name}} {{message.user.last_name}}</strong
+        >
+        posted on {{message.created_at}}
+      </p>
+      <p>
+        {{message.message}} <a href="/wall" id="reply">reply</a>
+        <a href="/{{message.id}}/delete_message" id="delete">delete</a>
+      </p>
+      <hr />
+
+      <div>
+        {% for comment in message.comments.all %}
+        <p>
+          <strong
+            >{{comment.user.first_name}} {{comment.user.last_name}}</strong
+          >
+          replied on {{comment.created_at}}
+        </p>
+        <p>&#x21B3; {{comment.comment}} </p>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- comments form -->
+    <div id="comment_form">
+      <form action="/new_comment" method="POST" id="comment_box">
+        {% csrf_token %}
+        <textarea
+          rows="3"
+          cols="70"
+          name="comment"
+          placeholder="&#x21B3; Post a comment."
+        ></textarea>
+        <input
+          type="hidden"
+          name="user_id"
+          value="{{request.session.user_id}}"
+        />
+        <input type="hidden" name="message_id" value="{{message.id}}" />
+
+        <button class="secondary">
+          Post a comment
+        </button>
+      </form>
+    </div>
+  </div>
+  {% endfor %}
+<br>
+
+</body>
+</html>

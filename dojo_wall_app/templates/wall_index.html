@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dojo Wall</title>
+    {% load static %}
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+    <script src="{% static 'js/script.js' %}"></script>
+  </head>
+  <body>
+    <div class="header">
+      <a href="/log_out">sign off</a>
+      <h2>CodingDojo Wall</h2>
+      <p>Welcome, {{user.first_name}}</p>
+    </div>
+    <div class="post">
+      <form action="/new_message" method="POST" id="message_box">
+        {%csrf_token%}
+        <!-- <label for="message">Post a message</label> -->
+        <br />
+        <textarea
+          name="message"
+          cols="100"
+          rows="10"
+          placeholder="Post a message."
+        ></textarea
+        ><br />
+        <input type="hidden" name="user_id" value="{{user.id}}" />
+        <button type="submit" class="primary">Post a message</button>
+      </form>
+    </div>
+    <!-- display errors -->
+
+    <div class="messages_all">
+      {% if messages %}
+      <ul id="error_list" class="messages_list">
+        {% for message in messages %}
+        <li {% if message.tags %} class="{{message.tags}}" {% endif %}>
+          {{message}}
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+    <br />
+    <div class="messages">
+      {% for message in all_messages reversed %}
+      <p>
+        <strong id="user"
+          >{{message.user.first_name}} {{message.user.last_name}}</strong
+        >
+        posted on {{message.created_at}}
+      </p>
+      <p>{{message.message}} <a href="/wall" id="reply">reply</a></p>
+      <hr />
+      {% endfor %}
+    </div>
+  </body>
+</html>
